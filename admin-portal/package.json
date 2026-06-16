@@ -1,0 +1,17 @@
+{
+    "name": "admin-portal",
+    "version": "1.0.0",
+    "description": "Consola de administración SSO MOBO (reemplaza /admin de Keycloak)",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "dotenv": "^17.4.2",
+        "express": "^4.18.2",
+        "express-session": "^1.17.3",
+        "mysql2": "^3.14.1",
+        "openid-client": "^5.4.2"
+    }
+}

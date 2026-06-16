@@ -1,0 +1,11 @@
+-- Alta de usuarios: usar scripts (hashean pass y asignan rol)
+--
+-- Usuario estándar (rol 2):
+-- .\scripts\insert-userSSO.ps1 -User jperez -Password "SuClave123" -Name Juan -LastName Perez -Email jperez@mobo.com -Rol 2
+--
+-- Administrador (rol 1):
+-- .\scripts\insert-userSSO.ps1 -User madmin -Password "SuClave123" -Name Maria -LastName Admin -Email madmin@mobo.com -Rol 1
+--
+-- Consultar roles:
+-- SELECT * FROM mobonet.roleSSO;
+-- SELECT u.user, u.name, r.nombre AS rol FROM mobonet.userSSO u JOIN mobonet.roleSSO r ON u.rol = r.id;

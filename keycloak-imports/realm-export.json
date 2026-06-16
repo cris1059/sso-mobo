@@ -1,0 +1,39 @@
+{
+  "realm": "mobo",
+  "enabled": true,
+  "loginTheme": "sso-apps",
+  "accountTheme": "sso-apps",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["es"],
+  "defaultLocale": "es",
+  "users": [],
+  "clients": [
+    {
+      "clientId": "mobonet",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "X3Su9Dyzd5ccr5rUsXYfia49FROT5Ffz",
+      "redirectUris": ["http://mobonet.localhost/*"],
+      "webOrigins": ["+"],
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "frontchannelLogout": true,
+      "attributes": {
+        "frontchannel.logout.url": "http://mobonet.localhost/?views=sso-logout"
+      }
+    },
+    {
+      "clientId": "admin-portal",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "admin-portal-secret",
+      "redirectUris": [
+        "http://192.168.10.150:3010/*",
+        "http://localhost:3002/*"
+      ],
+      "webOrigins": ["+"],
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false
+    }
+  ]
+}

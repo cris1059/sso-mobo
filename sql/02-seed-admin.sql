@@ -1,0 +1,2 @@
+-- El hash bcrypt del admin se inserta desde create-userSSO-table.ps1
+-- (no guardar contraseñas en texto plano en SQL)

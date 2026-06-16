@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 56" role="img" aria-label="Mobo">
+  <rect x="0" y="8" width="40" height="40" rx="10" fill="#0b5ed7"/>
+  <text x="52" y="38" font-family="Segoe UI, system-ui, sans-serif" font-size="28" font-weight="700" fill="#0d3b66">Mobo</text>
+  <text x="52" y="50" font-family="Segoe UI, system-ui, sans-serif" font-size="11" fill="#20c997">Acceso unificado</text>
+</svg>

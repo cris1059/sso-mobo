@@ -1,0 +1,49 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    command: ["start"]
+    environment:
+      KEYCLOAK_ADMIN: ${KC_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASS:-admin}
+      KC_DB: mariadb
+      KC_DB_URL: jdbc:mariadb://${KC_DB_HOST:-host.docker.internal}:${MYSQL_PORT:-3306}/keycloak?characterEncoding=UTF-8
+      KC_DB_USERNAME: ${MYSQL_USER:-aec}
+      KC_DB_PASSWORD: ${MYSQL_PASS}
+      KC_HOSTNAME: ${KC_HOSTNAME:-192.168.10.150}
+      KC_HOSTNAME_PORT: ${KC_PORT:-8089}
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: ${KC_PROXY:-edge}
+    ports:
+      - "${KC_PORT:-8089}:8080"
+    volumes:
+      - ./keycloak-imports:/opt/keycloak/data/import
+      - ./themes:/opt/keycloak/themes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  admin-portal:
+    build: ./admin-portal
+    ports:
+      - "${ADMIN_PORT:-3010}:3002"
+    environment:
+      PORT: 3002
+      SESSION_SECRET: ${SESSION_SECRET}
+      KEYCLOAK_URL: http://${KC_HOSTNAME:-192.168.10.150}:${KC_PORT:-8089}/realms/mobo
+      CLIENT_ID: admin-portal
+      CLIENT_SECRET: ${ADMIN_PORTAL_SECRET:-admin-portal-secret}
+      REDIRECT_URL: http://${KC_HOSTNAME:-192.168.10.150}:${ADMIN_PORT:-3010}/callback
+      KC_BASE_URL: http://keycloak:8080
+      KC_ADMIN: ${KC_ADMIN:-admin}
+      KC_ADMIN_PASS: ${KC_ADMIN_PASS:-admin}
+      KC_REALM: mobo
+      MYSQL_HOST: ${KC_DB_HOST:-host.docker.internal}
+      MYSQL_PORT: ${MYSQL_PORT:-3306}
+      MYSQL_USER: ${MYSQL_USER:-aec}
+      MYSQL_PASS: ${MYSQL_PASS}
+      MYSQL_DB: ${MYSQL_DB:-mobonet}
+    depends_on:
+      - keycloak
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

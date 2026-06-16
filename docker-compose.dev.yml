@@ -1,0 +1,17 @@
+# Desarrollo local — solo Keycloak (consola admin: npm start en admin-portal/)
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: ${KC_ADMIN:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASS:-admin}
+      KC_DB: mariadb
+      KC_DB_URL: jdbc:mariadb://${MYSQL_HOST:-192.168.10.150}:${MYSQL_PORT:-3306}/keycloak?characterEncoding=UTF-8
+      KC_DB_USERNAME: ${MYSQL_USER:-aec}
+      KC_DB_PASSWORD: ${MYSQL_PASS}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./keycloak-imports:/opt/keycloak/data/import
+      - ./themes:/opt/keycloak/themes

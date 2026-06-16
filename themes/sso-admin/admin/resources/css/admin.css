@@ -1,0 +1,29 @@
+/* Logo Keycloak debajo del logo MOBO en el login de la consola admin (React) */
+
+.pf-v5-c-login__header .pf-v5-c-brand,
+.pf-v5-c-login__main-header .pf-v5-c-brand {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+.pf-v5-c-login__header .pf-v5-c-brand::after,
+.pf-v5-c-login__main-header .pf-v5-c-brand::after {
+  content: "";
+  display: block;
+  width: 110px;
+  height: 30px;
+  margin: 0.6rem auto 0;
+  background: url("../img/keycloak-logo.png") center / contain no-repeat;
+}
+
+/* Mismo bloque de logos si el layout usa ::before en la tarjeta */
+.pf-v5-c-login__main::before {
+  background-image:
+    url("../img/keycloak-logo.png"),
+    url("../img/logo.png") !important;
+  background-position: center 88%, center 22% !important;
+  background-size: 40% auto, 58% auto !important;
+  background-repeat: no-repeat, no-repeat !important;
+  height: 132px !important;
+}

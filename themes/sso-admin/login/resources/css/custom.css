@@ -1,0 +1,461 @@
+/* MOBO SSO Login ? tema moderno (Plus Jakarta Sans via Google Fonts) */
+
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+
+:root {
+  --mobo-font: "Plus Jakarta Sans", system-ui, sans-serif;
+  --mobo-bg: #0c0c0c;
+  --mobo-bg-glow: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 255, 255, 0.06), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 100% 100%, rgba(255, 255, 255, 0.03), transparent 50%),
+    #0c0c0c;
+  --mobo-card: #161616;
+  --mobo-card-border: rgba(255, 255, 255, 0.08);
+  --mobo-card-shadow: 0 24px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--mobo-card-border);
+  --mobo-text: #f4f4f5;
+  --mobo-text-muted: #a1a1aa;
+  --mobo-accent: #ffffff;
+  --mobo-accent-hover: #e4e4e7;
+  --mobo-input-bg: #1e1e1e;
+  --mobo-input-border: #2a2a2a;
+  --mobo-input-focus: #404040;
+  --mobo-width: 500px;
+  --mobo-radius-lg: 20px;
+  --mobo-radius-md: 12px;
+  --mobo-radius-pill: 999px;
+  --mobo-transition: 0.2s ease;
+  --mobo-eye-zone: 36px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, .login-pf body {
+  margin: 0 !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+  font-family: var(--mobo-font) !important;
+  background: var(--mobo-bg-glow) !important;
+  color: var(--mobo-text) !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+.pf-v5-c-login__container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  min-height: unset !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  padding: 1rem 1.25rem !important;
+  background: var(--mobo-bg-glow) !important;
+}
+
+.pf-v5-c-login,
+.pf-v5-c-login__main,
+#kc-content,
+#kc-content-wrapper {
+  width: 100% !important;
+  max-width: var(--mobo-width) !important;
+  margin: 0 auto !important;
+}
+
+.pf-v5-c-login__main {
+  background: var(--mobo-card) !important;
+  border: 1px solid var(--mobo-card-border) !important;
+  border-radius: var(--mobo-radius-lg) !important;
+  box-shadow: var(--mobo-card-shadow) !important;
+  padding: 0 0 2rem !important;
+  overflow: hidden !important;
+  animation: mobo-fade-in 0.45s ease;
+}
+
+@keyframes mobo-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#kc-content, #kc-content-wrapper {
+  background: transparent !important;
+  padding: 0 2.25rem 0 !important;
+}
+
+/* Quitar bordes blancos que impone PatternFly / Keycloak */
+.pf-v5-c-login__main .pf-v5-c-form-control,
+.pf-v5-c-login__main .pf-v5-c-input-group,
+.pf-v5-c-login__main .pf-v5-c-form-control::before,
+.pf-v5-c-login__main .pf-v5-c-form-control::after {
+  border-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  --pf-v5-c-form-control--BorderColor: var(--mobo-input-border);
+  --pf-v5-c-form-control--BackgroundColor: var(--mobo-input-bg);
+}
+
+.pf-v5-c-login__main-header-utilities,
+#kc-header, .login-pf-page-header, #kc-header-wrapper {
+  display: none !important;
+}
+
+.pf-v5-c-login__main::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 132px;
+  padding: 1.35rem 3rem 1rem !important;
+  margin: 0 0 1.25rem;
+  box-sizing: border-box !important;
+  background-color: transparent !important;
+  background-image:
+    url("../img/keycloak-logo.png"),
+    url("../img/logo.png") !important;
+  background-position: center 88%, center 22% !important;
+  background-size: 40% auto, 58% auto !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-origin: content-box, content-box !important;
+  border-bottom: 1px solid var(--mobo-card-border);
+}
+
+#kc-page-title {
+  font-family: var(--mobo-font) !important;
+  font-size: 1.125rem !important;
+  font-weight: 600 !important;
+  color: var(--mobo-text) !important;
+  text-align: center !important;
+  margin: 0 0 0.85rem !important;
+  letter-spacing: -0.02em;
+}
+
+.pf-v5-c-login__main label,
+.pf-v5-c-form__label-text {
+  font-family: var(--mobo-font) !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--mobo-text-muted) !important;
+  margin-bottom: 0.35rem !important;
+}
+
+#kc-form-login {
+  width: 100% !important;
+}
+
+.pf-v5-c-form__group,
+.pf-v5-c-form__group + .pf-v5-c-form__group {
+  margin-bottom: 0.65rem !important;
+}
+
+#username,
+#kc-form-login input#username,
+#kc-form-login input[type="text"]:not([name="password"]) {
+  width: 100% !important;
+  height: 48px !important;
+  padding: 0 1rem !important;
+  font-family: var(--mobo-font) !important;
+  font-size: 0.9375rem !important;
+  color: var(--mobo-text) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#username:focus,
+#kc-form-login input[type="text"]:focus {
+  border-color: var(--mobo-input-focus) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Campo contrase?a + ojo ? un solo control integrado */
+.pf-v5-c-form-control:has(#password),
+.pf-v5-c-input-group:has(#password),
+.pf-v5-c-form__group:has(#password) > div:has(#password) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  background: var(--mobo-input-bg) !important;
+  border: 1px solid var(--mobo-input-border) !important;
+  border-radius: var(--mobo-radius-md) !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  transition: border-color var(--mobo-transition), background var(--mobo-transition);
+}
+
+.pf-v5-c-form-control:has(#password):focus-within,
+.pf-v5-c-input-group:has(#password):focus-within {
+  border-color: var(--mobo-input-focus) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#password,
+.pf-v5-c-form-control:has(#password) #password {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  height: 100% !important;
+  min-height: 48px !important;
+  padding: 0 1rem !important;
+  font-family: var(--mobo-font) !important;
+  font-size: 0.9375rem !important;
+  color: var(--mobo-text) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ojo: solo el contenedor directo (evita [class*="utilities"] que lo ensanchaba) */
+.pf-v5-c-form-control:has(#password) > .pf-v5-c-form-control__utilities {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 var(--mobo-eye-zone) !important;
+  width: var(--mobo-eye-zone) !important;
+  min-width: var(--mobo-eye-zone) !important;
+  max-width: var(--mobo-eye-zone) !important;
+  align-self: stretch !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-left: 1px solid var(--mobo-input-border) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.pf-v5-c-form-control:has(#password):focus-within > .pf-v5-c-form-control__utilities {
+  border-left-color: var(--mobo-input-focus) !important;
+}
+
+.pf-v5-c-form-control:has(#password) .pf-v5-c-form-control__toggle-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0 !important;
+}
+
+.pf-v5-c-form-control:has(#password) button.pf-v5-c-button,
+.pf-v5-c-form-control:has(#password) button[data-password-toggle],
+.pf-v5-c-form-control:has(#password) button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: var(--mobo-eye-zone) !important;
+  height: var(--mobo-eye-zone) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: var(--mobo-eye-zone) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--mobo-text-muted) !important;
+  cursor: pointer;
+}
+
+.pf-v5-c-form-control:has(#password) button:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: var(--mobo-text) !important;
+}
+
+.pf-v5-c-form-control:has(#password) button svg {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+#kc-form-options {
+  margin-top: 0.35rem !important;
+  font-size: 0.8125rem !important;
+}
+
+#kc-form-options a,
+#kc-registration a {
+  color: var(--mobo-text-muted) !important;
+  text-decoration: none !important;
+  transition: color var(--mobo-transition);
+}
+
+#kc-form-options a:hover {
+  color: var(--mobo-text) !important;
+}
+
+#kc-form-buttons {
+  display: flex !important;
+  justify-content: stretch !important;
+  margin-top: 0.65rem !important;
+}
+
+input#kc-login,
+#kc-form-buttons input[type="submit"],
+#kc-form-buttons .pf-v5-c-button.pf-m-primary {
+  width: 100% !important;
+  height: 48px !important;
+  font-family: var(--mobo-font) !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+  color: #0c0c0c !important;
+  background: var(--mobo-accent) !important;
+  border: none !important;
+  border-radius: var(--mobo-radius-pill) !important;
+  cursor: pointer;
+  transition: background var(--mobo-transition), transform 0.15s ease, box-shadow var(--mobo-transition);
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.12);
+}
+
+input#kc-login:hover,
+#kc-form-buttons input[type="submit"]:hover {
+  background: var(--mobo-accent-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+}
+
+input#kc-login:active {
+  transform: translateY(0);
+}
+
+.pf-v5-c-login__footer,
+.pf-v5-c-login__footer a[href*="keycloak.org"] {
+  display: none !important;
+}
+
+#kc-info-wrapper,
+.pf-v5-c-alert {
+  border-radius: var(--mobo-radius-md) !important;
+  font-family: var(--mobo-font) !important;
+  font-size: 0.875rem !important;
+}
+
+/* Wrapper PatternFly del usuario: un solo borde gris (no blanco) */
+.pf-v5-c-login__main .pf-v5-c-form-control:not(:has(#password)) {
+  display: block !important;
+  width: 100% !important;
+  border: 1px solid var(--mobo-input-border) !important;
+  border-radius: var(--mobo-radius-md) !important;
+  background: var(--mobo-input-bg) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control:not(:has(#password)) input {
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  background: transparent !important;
+}
+
+.pf-v5-c-login__main .pf-v5-c-form-control:not(:has(#password)):focus-within {
+  border-color: var(--mobo-input-focus) !important;
+}
+
+
+/* === Refuerzo bot?n ojo (compacto, integrado) === */
+:root {
+  --mobo-eye-zone: 32px;
+}
+
+.pf-v5-c-form-control:has(#password) .pf-v5-c-form-control__utilities {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 var(--mobo-eye-zone) !important;
+  width: var(--mobo-eye-zone) !important;
+  min-width: var(--mobo-eye-zone) !important;
+  max-width: var(--mobo-eye-zone) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-left: 1px solid var(--mobo-input-border) !important;
+  background: transparent !important;
+}
+
+.pf-v5-c-form-control:has(#password) .pf-v5-c-button.pf-m-control {
+  --pf-v5-c-button--MinWidth: 0px;
+  --pf-v5-c-button--PaddingBlock: 0;
+  --pf-v5-c-button--PaddingInline: 0;
+  min-width: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 48px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.pf-v5-c-form-control:has(#password) .pf-v5-c-form-control__utilities span {
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.pf-v5-c-form-control:has(#password) [class*="utilities"]:not(.pf-v5-c-form-control__utilities) {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Sin scroll: pantalla fija */
+html {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+body.login-pf,
+.login-pf,
+#kc-login,
+.pf-v5-c-login,
+.pf-v5-c-page {
+  height: 100vh !important;
+  max-height: 100vh !important;
+  overflow: hidden !important;
+}
+
+.pf-v5-c-login__container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  min-height: unset !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  padding: 1rem 1.25rem !important;
+  background: var(--mobo-bg-glow) !important;
+}
+
+.pf-v5-c-login__main {
+  max-height: calc(100vh - 2rem) !important;
+  overflow: hidden !important;
+  flex-shrink: 1 !important;
+}
+/* Consola admin (React): logo Keycloak debajo del brand MOBO */
+.pf-v5-c-login__header .pf-v5-c-brand::after,
+.pf-v5-c-login__main-header .pf-v5-c-brand::after {
+  content: "";
+  display: block;
+  width: 110px;
+  height: 30px;
+  margin: 0.6rem auto 0;
+  background: url("../img/keycloak-logo.png") center / contain no-repeat;
+}
