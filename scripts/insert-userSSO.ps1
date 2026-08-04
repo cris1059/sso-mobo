@@ -47,8 +47,8 @@ $esc = @{
 
 @"
 USE $db;
-INSERT INTO userSSO (user, pass_hash, name, last_name, email, area, dept, store, enabled, rol, intrDate)
-VALUES ('$($esc.user)', '$($esc.hash)', '$($esc.name)', '$($esc.last)', '$($esc.email)', '$($esc.area)', '$($esc.dept)', '$($esc.store)', 1, $Rol, CURDATE());
+INSERT INTO userSSO (user, pass_hash, name, last_name, email, area, dept, store, enabled, PrimerInicio, rol, intrDate)
+VALUES ('$($esc.user)', '$($esc.hash)', '$($esc.name)', '$($esc.last)', '$($esc.email)', '$($esc.area)', '$($esc.dept)', '$($esc.store)', 1, 1, $Rol, CURDATE());
 "@ | docker run --rm -i -e "MYSQL_PWD=$dbPass" mysql:8.0 `
     mysql "-h$host_" "-P$port" "-u$dbUser" --default-character-set=utf8mb4 $db
 
@@ -58,7 +58,7 @@ docker compose exec keycloak /opt/keycloak/bin/kcadm.sh config credentials `
     --server http://localhost:8080 --realm master --user admin --password admin | Out-Null
 
 Sync-UserSSOToKeycloak -Username $User -FirstName $Name -LastName $LastName -Email $Email `
-    -Enabled "true" -RolId $Rol -PlainPassword $Password
+    -Enabled "true" -RolId $Rol -PlainPassword $Password -PrimerInicio
 
 $acceso = if ($Rol -eq 1) { "login admin + login usuarios" } else { "solo login usuarios" }
 Write-Host ""

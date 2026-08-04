@@ -7,5 +7,5 @@
 -- .\scripts\insert-userSSO.ps1 -User madmin -Password "SuClave123" -Name Maria -LastName Admin -Email madmin@mobo.com -Rol 1
 --
 -- Consultar roles:
--- SELECT * FROM mobonet.roleSSO;
--- SELECT u.user, u.name, r.nombre AS rol FROM mobonet.userSSO u JOIN mobonet.roleSSO r ON u.rol = r.id;
+-- SELECT * FROM SSOMOBO.roleSSO;
+-- SELECT u.user, u.name, r.nombre AS rol FROM SSOMOBO.userSSO u JOIN SSOMOBO.roleSSO r ON u.rol = r.id;

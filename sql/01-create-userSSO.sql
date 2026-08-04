@@ -1,7 +1,7 @@
--- Tabla maestra de usuarios SSO en la BD MoboNet
+-- Tabla maestra de usuarios SSO en la BD SSOMOBO
 -- Ejecutar: .\scripts\create-userSSO-table.ps1
 
-USE mobonet;
+USE SSOMOBO;
 
 CREATE TABLE IF NOT EXISTS userSSO
 (

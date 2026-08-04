@@ -1,0 +1,9 @@
+﻿# Cómo instalar esta skill en Cursor
+
+1. En el proyecto donde vas a integrar SSO (o en el repo SSO), crea la carpeta:
+   .cursor/skills/integrate-mobo-sso/
+2. Copia aquí SKILL.md y prompt.md.
+3. Reinicia Cursor o abre un chat nuevo y menciona: skill integrate-mobo-sso
+4. Usa el prompt de prompt.md completando los campos «…».
+
+Ambiente: PROD (auth.sso.mobo.com.mx / admin.sso.mobo.com.mx).

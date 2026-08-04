@@ -42,7 +42,10 @@ async function kcRequest(method, path, body) {
     const text = await res.text();
     if (!res.ok) {
         let msg = text;
-        try { msg = JSON.parse(text).errorMessage || text; } catch { /* ignore */ }
+        try {
+            const parsed = JSON.parse(text);
+            msg = parsed.errorMessage || parsed.error_description || parsed.error || text;
+        } catch { /* ignore */ }
         throw new Error(msg || `Keycloak error ${res.status}`);
     }
 

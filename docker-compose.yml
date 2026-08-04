@@ -2,6 +2,12 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:25.0
     command: ["start"]
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && echo -e 'GET /auth/realms/mobo HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
     environment:
       KEYCLOAK_ADMIN: ${KC_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASS:-admin}
@@ -9,10 +15,19 @@ services:
       KC_DB_URL: jdbc:mariadb://${KC_DB_HOST:-host.docker.internal}:${MYSQL_PORT:-3306}/keycloak?characterEncoding=UTF-8
       KC_DB_USERNAME: ${MYSQL_USER:-aec}
       KC_DB_PASSWORD: ${MYSQL_PASS}
-      KC_HOSTNAME: ${KC_HOSTNAME:-192.168.10.150}
-      KC_HOSTNAME_PORT: ${KC_PORT:-8089}
+      KC_HTTP_RELATIVE_PATH: ${KC_HTTP_RELATIVE_PATH:-/auth}
+      # Keycloak 25 hostname v2: URL pública completa (proxy SSL)
+      KC_HOSTNAME: ${KC_PUBLIC_URL:-https://sso.mobo.com.mx/auth}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_HTTP_ENABLED: "true"
-      KC_PROXY: ${KC_PROXY:-edge}
+      KC_PROXY_HEADERS: xforwarded
+      # Codes del front HTTPS se pueden canjear por token en red Docker interna
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      # UAT: no cachear CSS/temas 30 días (evita franjas por CSS viejo en el navegador)
+      KC_SPI_THEME_STATIC_MAX_AGE: "-1"
+      KC_SPI_THEME_CACHE_THEMES: "false"
+      KC_SPI_THEME_CACHE_TEMPLATES: "false"
     ports:
       - "${KC_PORT:-8089}:8080"
     volumes:
@@ -29,11 +44,17 @@ services:
     environment:
       PORT: 3002
       SESSION_SECRET: ${SESSION_SECRET}
-      KEYCLOAK_URL: http://${KC_HOSTNAME:-192.168.10.150}:${KC_PORT:-8089}/realms/mobo
+      KEYCLOAK_URL: ${KEYCLOAK_URL:-https://sso.mobo.com.mx/auth/realms/mobo}
+      KEYCLOAK_INTERNAL_URL: ${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080${KC_HTTP_RELATIVE_PATH:-/auth}/realms/mobo}
       CLIENT_ID: admin-portal
       CLIENT_SECRET: ${ADMIN_PORTAL_SECRET:-admin-portal-secret}
-      REDIRECT_URL: http://${KC_HOSTNAME:-192.168.10.150}:${ADMIN_PORT:-3010}/callback
-      KC_BASE_URL: http://keycloak:8080
+      BASE_PATH: ${ADMIN_BASE_PATH:-/admin}
+      REDIRECT_URL: ${ADMIN_PUBLIC_URL:-https://sso.mobo.com.mx/admin}/callback
+      ADMIN_PUBLIC_URL: ${ADMIN_PUBLIC_URL:-https://sso.mobo.com.mx/admin}
+      KC_PUBLIC_URL: ${KC_PUBLIC_URL:-https://sso.mobo.com.mx/auth}
+      KC_BASE_URL: http://keycloak:8080${KC_HTTP_RELATIVE_PATH:-/auth}
+      # Cert del proxy Abraham: discovery/token HTTPS desde el contenedor
+      NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-0}
       KC_ADMIN: ${KC_ADMIN:-admin}
       KC_ADMIN_PASS: ${KC_ADMIN_PASS:-admin}
       KC_REALM: mobo
@@ -41,9 +62,18 @@ services:
       MYSQL_PORT: ${MYSQL_PORT:-3306}
       MYSQL_USER: ${MYSQL_USER:-aec}
       MYSQL_PASS: ${MYSQL_PASS}
-      MYSQL_DB: ${MYSQL_DB:-mobonet}
+      MYSQL_DB: ${MYSQL_DB:-SSOMOBO}
+      SYNC_SOURCE_HOST: ${SYNC_SOURCE_HOST:-192.168.10.80}
+      SYNC_SOURCE_PORT: ${SYNC_SOURCE_PORT:-3306}
+      SYNC_SOURCE_USER: ${SYNC_SOURCE_USER:-aec}
+      SYNC_SOURCE_PASS: ${SYNC_SOURCE_PASS}
+      SYNC_SOURCE_DB: ${SYNC_SOURCE_DB:-sync}
     depends_on:
-      - keycloak
+      keycloak:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+      - "sso.mobo.com.mx:host-gateway"
+      - "auth.sso.mobo.com.mx:host-gateway"
+      - "admin.sso.mobo.com.mx:host-gateway"
     restart: unless-stopped

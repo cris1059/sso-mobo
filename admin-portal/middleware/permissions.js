@@ -17,6 +17,11 @@ function isDevelopAdmin(req) {
     return Number(req.session.appUser?.rol) === ROLES.DEVELOP_ADMIN;
 }
 
+function canUseSeed(rol) {
+    const r = Number(rol);
+    return r === ROLES.ADMIN || r === ROLES.DEVELOP_ADMIN;
+}
+
 function requirePanelAccess(req, res, next) {
     if (!req.session.userInfo || !req.session.appUser) {
         return res.status(401).json({ error: 'No autenticado' });
@@ -37,6 +42,7 @@ function requireAdmin(req, res, next) {
 module.exports = {
     ROLES,
     canAccessPanel,
+    canUseSeed,
     isAdmin,
     isDevelopAdmin,
     requirePanelAccess,

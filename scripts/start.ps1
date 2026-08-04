@@ -13,7 +13,7 @@ for ($i = 0; $i -lt 30; $i++) {
     Start-Sleep -Seconds 5
     Write-Host "." -NoNewline
     try {
-        $resp = Invoke-WebRequest -Uri "http://localhost:8080/realms/master" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
+        $resp = Invoke-WebRequest -Uri "http://127.0.0.1:8080/realms/master" -UseBasicParsing -TimeoutSec 3 -ErrorAction Stop
         if ($resp.StatusCode -eq 200) { $ready = $true; break }
     } catch {}
 }
@@ -43,10 +43,18 @@ if ($themeCheck -notmatch "sso-admin") {
 
 & "$PSScriptRoot\register-admin-portal-client.ps1"
 
+Write-Host "Aplicando migracion de seguridad y configuracion Keycloak..." -ForegroundColor Yellow
+try {
+    & "$PSScriptRoot\run-migration-10.ps1"
+    & "$PSScriptRoot\configure-sso-security.ps1"
+} catch {
+    Write-Host "Aviso: migracion/seguridad no aplicada: $_" -ForegroundColor Yellow
+}
+
 Write-Host ""
 Write-Host "Opcional: vincular admin a sistemas y configurar acceso:" -ForegroundColor Yellow
 Write-Host "  .\scripts\seed-initial-access.ps1"
 Write-Host ""
 Write-Host "SSO MOBO UAT en linea:" -ForegroundColor Cyan
-Write-Host "  Keycloak       : http://localhost:8080"
-Write-Host "  Consola Admin  : http://localhost:3002   (npm start en admin-portal/)"
+Write-Host "  Keycloak       : http://127.0.0.1:8080"
+Write-Host "  Consola Admin  : http://127.0.0.1:3002   (npm start en admin-portal/)"

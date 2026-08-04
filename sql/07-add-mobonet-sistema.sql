@@ -1,5 +1,5 @@
 -- Restaura el sistema MoboNet (mobonet.localhost) si ya se ejecutó la migración 05 sin él
-USE mobonet;
+USE SSOMOBO;
 
 INSERT INTO sistemaSSO (client_id, nombre, owner, redirect_uris, web_origins, enabled) VALUES
     ('mobonet', 'MoboNet Portal', NULL, '["http://mobonet.localhost/*"]', '+', 1)

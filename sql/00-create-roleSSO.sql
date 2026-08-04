@@ -1,5 +1,5 @@
 -- Catálogo de roles SSO
-USE mobonet;
+USE SSOMOBO;
 
 CREATE TABLE IF NOT EXISTS roleSSO
 (

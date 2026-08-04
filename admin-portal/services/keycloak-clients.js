@@ -44,8 +44,44 @@ function parseWebOrigins(value) {
     return ['+'];
 }
 
+function deriveAppHomeUrl(redirectUris) {
+    const uris = parseRedirectUris(redirectUris);
+    for (const value of uris) {
+        try {
+            const url = new URL(value);
+            if (!['http:', 'https:'].includes(url.protocol)) continue;
+            return `${url.protocol}//${url.host}/`;
+        } catch {
+            // Ignorar patrones o redirects relativos; probar el siguiente.
+        }
+    }
+    return '';
+}
+
+function clientUrlSettings(redirectUris) {
+    const homeUrl = deriveAppHomeUrl(redirectUris);
+    return {
+        rootUrl: homeUrl || undefined,
+        baseUrl: homeUrl || undefined,
+        postLogoutRedirectUris: homeUrl ? `+##${homeUrl}` : '+',
+    };
+}
+
 function generateSecret() {
     return crypto.randomBytes(16).toString('hex');
+}
+
+/** "+" = mismas URIs que Valid Redirect URIs (logout RP-Initiated sin pantalla de confirmación). */
+async function ensurePostLogoutRedirectUris(clientUuid, client = null) {
+    const current = client || (await kcRequest('GET', `/realms/${APPS_REALM}/clients/${clientUuid}`));
+    const attrs = { ...(current.attributes || {}) };
+    if (attrs['post.logout.redirect.uris'] === '+') return current;
+    attrs['post.logout.redirect.uris'] = '+';
+    await kcRequest('PUT', `/realms/${APPS_REALM}/clients/${clientUuid}`, {
+        ...current,
+        attributes: attrs,
+    });
+    return kcRequest('GET', `/realms/${APPS_REALM}/clients/${clientUuid}`);
 }
 
 async function listClients() {
@@ -71,10 +107,11 @@ async function createClient({ clientId, name, redirectUris, webOrigins, secret, 
     const uris = parseRedirectUris(redirectUris);
     if (!uris.length) throw new Error('Al menos una Redirect URI es obligatoria');
 
+    const id = clientId.trim();
+    const urlSettings = clientUrlSettings(uris);
     const clientSecret = secret?.trim() || generateSecret();
-
-    await kcRequest('POST', `/realms/${APPS_REALM}/clients`, {
-        clientId: clientId.trim(),
+    const payload = {
+        clientId: id,
         name: (name || clientId).trim(),
         enabled: enabled !== false && enabled !== '0' && enabled !== 0,
         protocol: 'openid-connect',
@@ -82,21 +119,73 @@ async function createClient({ clientId, name, redirectUris, webOrigins, secret, 
         clientAuthenticatorType: 'client-secret',
         secret: clientSecret,
         redirectUris: uris,
+        rootUrl: urlSettings.rootUrl,
+        baseUrl: urlSettings.baseUrl,
         webOrigins: parseWebOrigins(webOrigins),
         standardFlowEnabled: true,
         directAccessGrantsEnabled: false,
-    });
+    };
 
-    const created = await kcRequest(
+    let reusedExisting = false;
+    try {
+        await kcRequest('POST', `/realms/${APPS_REALM}/clients`, payload);
+    } catch (err) {
+        const msg = String(err.message || '').toLowerCase();
+        if (!msg.includes('already exists')) throw err;
+        reusedExisting = true;
+    }
+
+    const found = await kcRequest(
         'GET',
-        `/realms/${APPS_REALM}/clients?clientId=${encodeURIComponent(clientId.trim())}`
+        `/realms/${APPS_REALM}/clients?clientId=${encodeURIComponent(id)}`
     );
+    if (!found?.[0]) throw new Error(`Cliente ${id} no encontrado en Keycloak tras crearlo`);
 
-    const kcUuid = created[0].id;
+    const kcUuid = found[0].id;
+    let effectiveSecret = clientSecret;
+
+    if (reusedExisting) {
+        await kcRequest('PUT', `/realms/${APPS_REALM}/clients/${kcUuid}`, {
+            ...found[0],
+            name: payload.name,
+            enabled: payload.enabled,
+            redirectUris: payload.redirectUris,
+            rootUrl: urlSettings.rootUrl,
+            baseUrl: urlSettings.baseUrl,
+            webOrigins: payload.webOrigins,
+            standardFlowEnabled: true,
+            publicClient: false,
+            directAccessGrantsEnabled: false,
+            attributes: {
+                ...(found[0].attributes || {}),
+                'post.logout.redirect.uris': urlSettings.postLogoutRedirectUris,
+            },
+        });
+        if (secret?.trim()) {
+            // Keycloak no permite setear secret arbitrario vía PUT en todos los casos;
+            // si el caller mandó uno, regeneramos y devolvemos el nuevo.
+            effectiveSecret = await regenerateSecret(kcUuid);
+        } else {
+            effectiveSecret = await getClientSecret(kcUuid);
+        }
+    } else {
+        const current = await kcRequest('GET', `/realms/${APPS_REALM}/clients/${kcUuid}`);
+        await kcRequest('PUT', `/realms/${APPS_REALM}/clients/${kcUuid}`, {
+            ...current,
+            rootUrl: urlSettings.rootUrl,
+            baseUrl: urlSettings.baseUrl,
+            attributes: {
+                ...(current.attributes || {}),
+                'post.logout.redirect.uris': urlSettings.postLogoutRedirectUris,
+            },
+        });
+    }
+
     await kcAccess.ensureAccessRole(kcUuid);
-    await kcEnforcement.ensureClientLoginEnforcement(clientId.trim());
+    await kcEnforcement.ensureClientLoginEnforcement(id);
 
-    return { ...toPublicClient(created[0]), secret: clientSecret, kc_client_uuid: kcUuid };
+    const latest = await kcRequest('GET', `/realms/${APPS_REALM}/clients/${kcUuid}`);
+    return { ...toPublicClient(latest), secret: effectiveSecret, kc_client_uuid: kcUuid };
 }
 
 async function updateClient(internalId, { name, redirectUris, webOrigins, enabled }) {
@@ -106,13 +195,20 @@ async function updateClient(internalId, { name, redirectUris, webOrigins, enable
     const uris = parseRedirectUris(redirectUris);
     if (!uris.length) throw new Error('Al menos una Redirect URI es obligatoria');
 
+    const urlSettings = clientUrlSettings(uris);
     await kcRequest('PUT', `/realms/${APPS_REALM}/clients/${internalId}`, {
         ...existing,
         name: (name || existing.clientId).trim(),
         enabled: enabled !== false && enabled !== '0' && enabled !== 0,
         redirectUris: uris,
+        rootUrl: urlSettings.rootUrl,
+        baseUrl: urlSettings.baseUrl,
         webOrigins: parseWebOrigins(webOrigins),
         standardFlowEnabled: true,
+        attributes: {
+            ...(existing.attributes || {}),
+            'post.logout.redirect.uris': urlSettings.postLogoutRedirectUris,
+        },
     });
 
     return getClientById(internalId);
@@ -130,6 +226,23 @@ async function regenerateSecret(internalId) {
     return data?.value || '';
 }
 
+async function ensureClientHomeUrl(internalId, redirectUris) {
+    const existing = await kcRequest('GET', `/realms/${APPS_REALM}/clients/${internalId}`);
+    if (!isAppClient(existing)) throw new Error('Cliente no encontrado');
+    const settings = clientUrlSettings(redirectUris?.length ? redirectUris : existing.redirectUris);
+    if (!settings.rootUrl) return existing;
+    await kcRequest('PUT', `/realms/${APPS_REALM}/clients/${internalId}`, {
+        ...existing,
+        rootUrl: settings.rootUrl,
+        baseUrl: settings.baseUrl,
+        attributes: {
+            ...(existing.attributes || {}),
+            'post.logout.redirect.uris': settings.postLogoutRedirectUris,
+        },
+    });
+    return kcRequest('GET', `/realms/${APPS_REALM}/clients/${internalId}`);
+}
+
 module.exports = {
     listClients,
     getClientById,
@@ -138,4 +251,6 @@ module.exports = {
     updateClient,
     deleteClient,
     regenerateSecret,
+    deriveAppHomeUrl,
+    ensureClientHomeUrl,
 };

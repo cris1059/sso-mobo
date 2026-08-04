@@ -38,6 +38,7 @@ Write-Host "master: tema sso-admin + espanol OK"
 docker compose exec keycloak /opt/keycloak/bin/kcadm.sh update realms/mobo `
     -s loginTheme=sso-apps `
     -s accountTheme=sso-apps `
+    -s emailTheme=sso-apps `
     -s internationalizationEnabled=true `
     -s defaultLocale=es
 
@@ -45,6 +46,10 @@ docker compose exec keycloak /opt/keycloak/bin/kcadm.sh update realms/mobo `
     /opt/keycloak/bin/kcadm.sh update realms/mobo -f -
 
 Write-Host "mobo: tema sso-apps + espanol OK"
+
+Write-Host ""
+Write-Host "Configurando sesiones SSO a 24 horas..."
+& (Join-Path $PSScriptRoot "configure-session-timeout.ps1")
 
 Write-Host ""
 Write-Host "Listo. Refresca el navegador con Ctrl+F5."

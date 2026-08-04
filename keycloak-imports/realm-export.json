@@ -1,11 +1,23 @@
 {
   "realm": "mobo",
   "enabled": true,
+  "ssoSessionIdleTimeout": 86400,
+  "ssoSessionMaxLifespan": 86400,
+  "clientSessionIdleTimeout": 86400,
+  "clientSessionMaxLifespan": 86400,
   "loginTheme": "sso-apps",
   "accountTheme": "sso-apps",
+  "emailTheme": "sso-apps",
   "internationalizationEnabled": true,
   "supportedLocales": ["es"],
   "defaultLocale": "es",
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "otpPolicyLookAheadWindow": 1,
   "users": [],
   "clients": [
     {
@@ -13,7 +25,12 @@
       "enabled": true,
       "clientAuthenticatorType": "client-secret",
       "secret": "X3Su9Dyzd5ccr5rUsXYfia49FROT5Ffz",
-      "redirectUris": ["http://mobonet.localhost/*"],
+      "redirectUris": [
+        "http://mobonet.localhost/*",
+        "http://localhost/mobonet/*",
+        "http://127.0.0.1/mobonet/*",
+        "http://uat.mobonet.mx/*"
+      ],
       "webOrigins": ["+"],
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,

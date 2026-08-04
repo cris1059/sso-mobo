@@ -1,5 +1,5 @@
 -- Rol developAdmin + tablas sistemaSSO y userSSO_sistema
-USE mobonet;
+USE SSOMOBO;
 
 INSERT INTO roleSSO (id, nombre, descripcion) VALUES
     (3, 'developAdmin', 'Administrador de uno o mas sistemas SSO')

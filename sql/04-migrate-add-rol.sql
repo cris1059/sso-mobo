@@ -1,5 +1,5 @@
 -- Migración: agrega roleSSO y columna rol en userSSO (instalaciones existentes)
-USE mobonet;
+USE SSOMOBO;
 
 CREATE TABLE IF NOT EXISTS roleSSO
 (
@@ -22,7 +22,7 @@ ON DUPLICATE KEY UPDATE
 SET @has_rol := (
     SELECT COUNT(*)
     FROM information_schema.COLUMNS
-    WHERE TABLE_SCHEMA = 'mobonet'
+    WHERE TABLE_SCHEMA = DATABASE()
       AND TABLE_NAME = 'userSSO'
       AND COLUMN_NAME = 'rol'
 );
@@ -43,7 +43,7 @@ UPDATE userSSO SET rol = 2 WHERE rol IS NULL OR rol NOT IN (1, 2);
 SET @has_fk := (
     SELECT COUNT(*)
     FROM information_schema.TABLE_CONSTRAINTS
-    WHERE TABLE_SCHEMA = 'mobonet'
+    WHERE TABLE_SCHEMA = DATABASE()
       AND TABLE_NAME = 'userSSO'
       AND CONSTRAINT_NAME = 'fk_userSSO_rol'
 );

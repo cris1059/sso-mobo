@@ -1,2 +1,62 @@
-﻿/* Reservado para ajustes finos tuyos */
+﻿/* Carga DESPUÉS de custom.css — anula PatternFly login (franja negra) */
 
+#keycloak-bg,
+html,
+body,
+body.login-pf,
+.login-pf,
+.login-pf body {
+  background: var(--mobo-bg-glow, #0c0c0c) !important;
+  background-image: none !important;
+}
+
+.pf-v5-c-login {
+  --pf-v5-c-login__container--MaxWidth: none !important;
+  --pf-v5-c-login__container--xl--MaxWidth: none !important;
+  --pf-v5-c-login__container--PaddingLeft: 0 !important;
+  --pf-v5-c-login__container--PaddingRight: 0 !important;
+  --pf-v5-c-login__container--xl--GridTemplateColumns: minmax(0, 1fr) !important;
+  --pf-v5-c-login__main--BackgroundColor: transparent !important;
+  --pf-v5-c-login__main--BoxShadow: none !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.pf-v5-c-login__container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  grid-template-columns: none !important;
+  grid-template-areas: none !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 1rem 1.25rem !important;
+  padding-inline-start: 1.25rem !important;
+  padding-inline-end: 1.25rem !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Solo la tarjeta debe verse como panel negro */
+.pf-v5-c-login__main {
+  width: 100% !important;
+  max-width: 500px !important;
+  margin: 0 auto !important;
+  background: #161616 !important;
+  background-color: #161616 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55) !important;
+}

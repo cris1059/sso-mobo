@@ -25,7 +25,6 @@
   --mobo-transition: 0.2s ease;
   --mobo-eye-zone: 36px;
 }
-
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -48,14 +47,31 @@ html, body, .login-pf body {
   justify-content: center !important;
   height: 100vh !important;
   max-height: 100vh !important;
-  min-height: unset !important;
-  overflow: hidden !important;
+  min-height: 100vh !important;
   width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
   padding: 1rem 1.25rem !important;
   background: var(--mobo-bg-glow) !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
+/* El wrapper PatternFly NO debe verse como franja/panel detrás de la tarjeta */
 .pf-v5-c-login,
+.login-pf-page,
+.login-pf {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
 .pf-v5-c-login__main,
 #kc-content,
 #kc-content-wrapper {
@@ -428,6 +444,8 @@ body.login-pf,
   height: 100vh !important;
   max-height: 100vh !important;
   overflow: hidden !important;
+  background: transparent !important;
+  max-width: none !important;
 }
 
 .pf-v5-c-login__container {
@@ -437,11 +455,16 @@ body.login-pf,
   justify-content: center !important;
   height: 100vh !important;
   max-height: 100vh !important;
-  min-height: unset !important;
-  overflow: hidden !important;
+  min-height: 100vh !important;
   width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
   padding: 1rem 1.25rem !important;
   background: var(--mobo-bg-glow) !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 .pf-v5-c-login__main {
@@ -458,4 +481,14 @@ body.login-pf,
   height: 30px;
   margin: 0.6rem auto 0;
   background: url("../img/keycloak-logo.png") center / contain no-repeat;
+}
+
+/* Override autofill styling (prevent browser from forcing white/yellow backgrounds and dark text) */
+#kc-form-login input:-webkit-autofill,
+#kc-form-login input:-webkit-autofill:hover,
+#kc-form-login input:-webkit-autofill:focus,
+#kc-form-login input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--mobo-text) !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--mobo-input-bg) inset !important;
+  transition: background-color 9999s ease-out 0s !important;
 }

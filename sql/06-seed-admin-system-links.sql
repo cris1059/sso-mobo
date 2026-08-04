@@ -1,5 +1,5 @@
 -- Vincula el usuario admin a todos los sistemas existentes
-USE mobonet;
+USE SSOMOBO;
 
 INSERT INTO userSSO_sistema (user, sistema_id, linked_by)
 SELECT 'admin', s.id, 'admin'

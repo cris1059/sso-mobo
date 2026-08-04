@@ -1,3 +1,20 @@
 vendor/
 node_modules/
 .env
+admin-portal/.env
+
+# Scripts locales de ops con credenciales (no subir)
+scripts/*-server*.py
+scripts/inspect*.py
+scripts/deploy-server.py
+scripts/setup-domains.py
+scripts/check-*.py
+scripts/debug-*.py
+scripts/diagnose-*.py
+scripts/fix-*.py
+scripts/post-install-*.py
+scripts/read-*.py
+scripts/revert-*.py
+scripts/verify-*.py
+scripts/test-*.py
+scripts/add-hosts-uat-sso.ps1

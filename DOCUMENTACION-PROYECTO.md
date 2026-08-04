@@ -6,7 +6,7 @@ Este documento describe el **objetivo general**, el **funcionamiento** y los **r
 
 ## Objetivo general
 
-Este repositorio implementa **Single Sign-On (SSO)** para el ecosistema MOBO. La idea central es que **un solo login en Keycloak** sirva para acceder a múltiples aplicaciones conectadas, con **MySQL (MoboNet) como fuente maestra de usuarios** y Keycloak como proveedor de identidad (IdP).
+Este repositorio implementa **Single Sign-On (SSO)** para el ecosistema MOBO. La idea central es que **un solo login en Keycloak** sirva para acceder a múltiples aplicaciones conectadas, con la base MySQL **`SSOMOBO` como fuente maestra de usuarios** y Keycloak como proveedor de identidad (IdP).
 
 En la práctica resuelve cuatro cosas:
 
@@ -25,7 +25,7 @@ MOBO puede tener un login único, centralizado y con roles, donde MySQL es la ve
 
 ```mermaid
 flowchart LR
-    subgraph BD["MoboNet (MySQL)"]
+    subgraph BD["SSOMOBO (MySQL)"]
         userSSO[userSSO]
         roleSSO[roleSSO]
         sistemaSSO[sistemaSSO]
@@ -68,7 +68,7 @@ flowchart LR
 
 | Componente | Rol |
 |------------|-----|
-| **MoboNet (MySQL)** | Fuente maestra: usuarios, roles, sistemas y vínculos |
+| **SSOMOBO (MySQL)** | Fuente maestra: usuarios, roles, sistemas y vínculos |
 | **Keycloak** | Identity Provider (IdP); emite tokens y gestiona sesiones SSO |
 | **admin-portal** | Consola MOBO: CRUD usuarios, roles, sistemas y vínculos |
 | **Scripts PowerShell / Node** | Migraciones, alta de usuarios y sincronización MySQL → Keycloak |
@@ -129,6 +129,37 @@ Lógica de sincronización según rol:
 | Rol `access` | Rol de cliente en Keycloak por cada sistema |
 | Enforcement | Flujo `browser-access-{clientId}` exige rol `access` al iniciar sesión |
 | Apps | Validan `resource_access[clientId].roles` en el access token |
+
+### 4.1 Step-up 2FA por rol interno
+
+Cada registro de `sistemaRoleSSO` puede activar `require_2fa`. Cuando un usuario tiene al menos un rol interno protegido, la sincronización asigna el client role genérico `otp_required`:
+
+```json
+{
+  "resource_access": {
+    "sed-evaluacion": {
+      "roles": ["access", "admin", "otp_required"]
+    }
+  }
+}
+```
+
+La aplicación cliente no debe suponer que el rol protegido se llama `admin`. Debe:
+
+1. Validar criptográficamente el Access Token y detectar `otp_required`.
+2. Si el token no contiene `acr=mobo-2fa`, iniciar otra autorización con `acr_values=mobo-2fa`.
+3. Crear `state`, `nonce` y PKCE nuevos para cada autorización y validarlos en el callback.
+4. Crear o elevar la sesión sólo cuando el token validado contenga `acr=mobo-2fa`.
+5. Persistir y revalidar `acr` y `requires_2fa` al renovar tokens.
+6. Aplicar middleware de servidor a las operaciones privilegiadas.
+
+Keycloak mantiene el mapeo:
+
+```text
+mobo-2fa → LoA 2
+```
+
+La opción se administra por sistema desde **Sistemas → Roles internos → 2FA**. Un `developAdmin` sólo puede cambiar roles de los sistemas de los que es propietario. Los roles existentes quedan desactivados por defecto.
 
 ### 5. Autenticación en aplicaciones (OpenID Connect)
 
@@ -215,6 +246,7 @@ Vinculación N:M entre usuarios y sistemas. Determina quién recibe el rol `acce
 | `update-userSSO-password.ps1` | Cambia contraseña en MySQL y Keycloak |
 | `sync-userSSO-to-keycloak.ps1` | Re-sincroniza perfiles + acceso + enforcement |
 | `seed-initial-access.ps1` | Seed vínculos admin + sync acceso + devadmin opcional |
+| `admin-portal/routes/api/seed.js` | Seeders HTTP: puestos, usuarios y **sistema→usuarios multi-rol** (`/api/seed/*`) |
 | `sync-all-access.js` | UUIDs, roles `access` y flujos de login por sistema |
 | `register-admin-portal-client.ps1` | Registra cliente OIDC de la consola |
 

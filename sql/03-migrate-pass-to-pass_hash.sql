@@ -1,10 +1,10 @@
 -- Migración: columna pass (texto plano) -> pass_hash (bcrypt)
-USE mobonet;
+USE SSOMOBO;
 
 SET @has_pass := (
     SELECT COUNT(*)
     FROM information_schema.COLUMNS
-    WHERE TABLE_SCHEMA = 'mobonet'
+    WHERE TABLE_SCHEMA = DATABASE()
       AND TABLE_NAME = 'userSSO'
       AND COLUMN_NAME = 'pass'
 );

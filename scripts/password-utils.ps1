@@ -56,11 +56,13 @@ function Set-KeycloakPasswordPlain {
     param(
         [Parameter(Mandatory)][string]$Username,
         [Parameter(Mandatory)][string]$PlainPassword,
-        [Parameter(Mandatory)][string]$Realm
+        [Parameter(Mandatory)][string]$Realm,
+        [switch]$Temporary
     )
 
+    $tempArg = if ($Temporary) { @("--temporary") } else { @() }
     docker compose exec -T keycloak /opt/keycloak/bin/kcadm.sh set-password -r $Realm `
-        --username $Username --new-password $PlainPassword | Out-Null
+        --username $Username --new-password $PlainPassword @tempArg | Out-Null
     if ($LASTEXITCODE -ne 0) { throw "No se pudo actualizar la contraseña en Keycloak ($Realm) para '$Username'." }
 }
 
@@ -138,15 +140,18 @@ function Sync-UserSSOToKeycloak {
         [Parameter(Mandatory)][string]$Enabled,
         [Parameter(Mandatory)][int]$RolId,
         [string]$PlainPassword = "",
+        [switch]$PrimerInicio,
         [string]$AppsRealm = "mobo",
         [string]$AdminRealm = "master"
     )
+
+    $tempPwd = [bool]$PrimerInicio
 
     # Login usuarios (tema sso-apps, realm mobo): Admin y Usuario
     Sync-KeycloakUserProfile -Username $Username -FirstName $FirstName -LastName $LastName `
         -Email $Email -Enabled $Enabled -Realm $AppsRealm
     if ($PlainPassword) {
-        Set-KeycloakPasswordPlain -Username $Username -PlainPassword $PlainPassword -Realm $AppsRealm
+        Set-KeycloakPasswordPlain -Username $Username -PlainPassword $PlainPassword -Realm $AppsRealm -Temporary:$tempPwd
     }
     Sync-KeycloakUserRole -Username $Username -RolId $RolId -Realm $AppsRealm
 
@@ -155,7 +160,7 @@ function Sync-UserSSOToKeycloak {
         Sync-KeycloakUserProfile -Username $Username -FirstName $FirstName -LastName $LastName `
             -Email $Email -Enabled $Enabled -Realm $AdminRealm
         if ($PlainPassword) {
-            Set-KeycloakPasswordPlain -Username $Username -PlainPassword $PlainPassword -Realm $AdminRealm
+            Set-KeycloakPasswordPlain -Username $Username -PlainPassword $PlainPassword -Realm $AdminRealm -Temporary:$tempPwd
         }
         if ($RolId -eq 1) {
             Grant-KeycloakMasterAdminAccess -Username $Username -AdminRealm $AdminRealm
